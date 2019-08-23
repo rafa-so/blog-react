@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
-function App() {
-  return (
-    <div>
-      
-    </div>
-  );
+import Home from './components/Home';
+import Header from './components/Header';
+
+import firebase from './firebase';
+
+import './global.css';
+
+export default class App extends Component {
+
+  state = {
+    firebaseInitializaded: false
+  };
+
+  componentDidMount(){
+    firebase.isInitialized().then(resultado => {
+      this.setState({ firebaseInitializaded: resultado });
+    });
+  }
+
+  render(){
+    return this.state.firebaseInitializaded !== false ? (
+      <BrowserRouter>
+        <Header />
+        <Switch>
+          <Route path="/" component={ Home } />
+        </Switch>
+      </BrowserRouter>
+    ) : (
+      <h1>Carregando...</h1>
+    );
+  }
 }
-
-export default App;
