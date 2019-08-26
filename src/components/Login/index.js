@@ -19,7 +19,7 @@ class Login extends Component {
 
     componentDidMount(){
         if (firebase.getCurrent()) {
-            this.props.history.replace('dashboard');
+            this.props.history.replace('/dashboard');
         }
     }
 
