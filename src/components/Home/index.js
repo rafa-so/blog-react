@@ -23,6 +23,7 @@ export default class Home extends Component {
                 });
             });
 
+            state.posts.reverse();
             this.setState(state);
         });
     }

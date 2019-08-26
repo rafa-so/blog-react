@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 
+import firebase from '../../firebase';
+
 import './new.css'
 
 class New extends Component {
@@ -9,14 +11,39 @@ class New extends Component {
         this.state = {
             titulo: "",
             imagem: "",
-            descricao: ""
+            descricao: "",
+            alert: ''
         };
 
     this.cadastrar = this.cadastrar.bind(this);
     }
 
-    cadastrar(){
+    componentDidMount(){
+        if (!firebase.getCurrent()) {
+            this.props.history.replace('/login');
+            return null;
+        }
+    }
 
+    cadastrar = async(e) => {
+        e.preventDefault();
+
+        const { titulo, imagem, descricao } = this.state;
+        
+        if (titulo !== '' && imagem !== '' && descricao !== '') {
+            let posts = firebase.db.ref('posts');
+            let chave = posts.push().key;
+            await posts.child(chave).set({
+                titulo: titulo,
+                imagem: imagem,
+                descricao: descricao,
+                autor: localStorage.nome
+            });
+
+            this.props.history.push('/dashboard')
+        } else {
+            this.setState({ alert: 'Todos os campos obrigatórios!' });
+        }
     }
 
     render() {
@@ -26,6 +53,7 @@ class New extends Component {
                     <Link to="/dashboard">Voltar</Link>
                 </header>
                 <form onSubmit={ this.cadastrar } id="new-post">
+                    <span> { this.state.alert } </span>
                     <label>Título: </label>
                     <input type="text" placeholder="Nome do post" 
                         value={ this.state.titulo } autoFocus
