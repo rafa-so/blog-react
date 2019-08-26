@@ -13,7 +13,8 @@ class New extends Component {
             imagem: null,
             url: '',
             descricao: "",
-            alert: ''
+            alert: '',
+            progress: 0
         };
 
     this.cadastrar = this.cadastrar.bind(this);
@@ -45,12 +46,27 @@ class New extends Component {
     handleUpload = async () => {
         const { imagem } = this.state;
         const uid = firebase.getCurrentUid();
+
         const uploadTask = firebase.storage
             .ref(`imagens/${uid}/${imagem.name}`)
             .put(imagem);
 
-        // await uploadTask.on('state-changed', );
-        //  console.log(this.state.imagem);
+        await uploadTask.on('state-changed', 
+        (snapshot) => {
+            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            this.setState({progress});
+        },
+        (error) => {
+            console.log('error: ' + error);
+        },
+        () => {
+            firebase.storage.ref(`imagens/${uid}`)
+            .child(imagem.name).getDownloadURL()
+            .then((url) => {
+                this.setState({ url: url });
+                console.log('url: ' + url);
+            });
+        });
     }
 
     cadastrar = async(e) => {
@@ -85,6 +101,12 @@ class New extends Component {
                     
                     <input type="file"
                         onChange={ this.handleFile }/>
+                    { this.state.url !== '' ?
+                        <img src={ this.state.url } width="250" 
+                            height="250" alt="Capa do post" />
+                        :
+                        <progess value={ this.state.progress } max="100" />
+                    }
 
                     <label>Título: </label>
                     <input type="text" placeholder="Nome do post" 
