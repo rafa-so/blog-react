@@ -4,6 +4,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import Home from './components/Home';
 import Header from './components/Header';
 import Login from './components/Login';
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 
 import firebase from './firebase';
@@ -30,6 +31,7 @@ export default class App extends Component {
           <Route exact path="/" component={ Home } />
           <Route path="/login" component={ Login } />
           <Route path="/dashboard" component={ Dashboard } />
+          <Route path="/register" component={ Register } />
         </Switch>
       </BrowserRouter>
     ) : (
