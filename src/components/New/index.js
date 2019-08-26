@@ -10,12 +10,15 @@ class New extends Component {
         super(props);
         this.state = {
             titulo: "",
-            imagem: "",
+            imagem: null,
+            url: '',
             descricao: "",
             alert: ''
         };
 
     this.cadastrar = this.cadastrar.bind(this);
+    this.handleFile = this.handleFile.bind(this);
+    this.handleUpload = this.handleUpload.bind(this);
     }
 
     componentDidMount(){
@@ -23,6 +26,31 @@ class New extends Component {
             this.props.history.replace('/login');
             return null;
         }
+    }
+
+    handleFile = async(e) => {
+        if (e.target.files[0]) {
+            const imagem = e.target.files[0];
+            if (imagem.type === 'image/png' || imagem.type === 'image/jpeg') {
+                await this.setState({ imagem: imagem });
+                this.handleUpload();
+            } else {
+                alert('Envie uma imagem PNG ou JPEG.');
+                this.setState({ imagem: null });
+                return null;
+            }
+        }
+    }
+
+    handleUpload = async () => {
+        const { imagem } = this.state;
+        const uid = firebase.getCurrentUid();
+        const uploadTask = firebase.storage
+            .ref(`imagens/${uid}/${imagem.name}`)
+            .put(imagem);
+
+        // await uploadTask.on('state-changed', );
+        //  console.log(this.state.imagem);
     }
 
     cadastrar = async(e) => {
@@ -54,15 +82,14 @@ class New extends Component {
                 </header>
                 <form onSubmit={ this.cadastrar } id="new-post">
                     <span> { this.state.alert } </span>
+                    
+                    <input type="file"
+                        onChange={ this.handleFile }/>
+
                     <label>Título: </label>
                     <input type="text" placeholder="Nome do post" 
                         value={ this.state.titulo } autoFocus
                         onChange={ (e) => this.setState({ titulo: e.target.value }) }/>
-                    
-                    <label>Imagem: </label>
-                    <input type="text" placeholder="Url da imagem" 
-                        value={ this.state.imagem }
-                        onChange={ (e) => this.setState({ imagem: e.target.value }) }/>
                     
                     <label>Descrição: </label>
                     <textarea type="text" placeholder="Descrição do post" 
