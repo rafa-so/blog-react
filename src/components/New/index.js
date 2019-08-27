@@ -51,10 +51,10 @@ class New extends Component {
             .ref(`imagens/${uid}/${imagem.name}`)
             .put(imagem);
 
-        await uploadTask.on('state-changed', 
+        await uploadTask.on('state_changed', 
         (snapshot) => {
             const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            this.setState({progress});
+            this.setState({ progress: progress });
         },
         (error) => {
             console.log('error: ' + error);
@@ -72,14 +72,19 @@ class New extends Component {
     cadastrar = async(e) => {
         e.preventDefault();
 
-        const { titulo, imagem, descricao } = this.state;
+        const { titulo, imagem, descricao, url } = this.state;
         
-        if (titulo !== '' && imagem !== '' && descricao !== '') {
+        if (titulo !== '' && 
+            imagem !== '' && 
+            descricao !== '' &&
+            imagem !== null &
+            url !== '') {
+
             let posts = firebase.db.ref('posts');
             let chave = posts.push().key;
             await posts.child(chave).set({
                 titulo: titulo,
-                imagem: imagem,
+                imagem: url,
                 descricao: descricao,
                 autor: localStorage.nome
             });
@@ -105,7 +110,7 @@ class New extends Component {
                         <img src={ this.state.url } width="250" 
                             height="250" alt="Capa do post" />
                         :
-                        <progess value={ this.state.progress } max="100" />
+                        <progress value={ this.state.progress } max="100" />
                     }
 
                     <label>Título: </label>
